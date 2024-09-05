@@ -1,9 +1,12 @@
 from dependency_injector.wiring import Provide
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.container import Container
 from app.core.dependencies import get_current_active_user
+from app.core.constant import Role
 from app.core.middleware import inject
+
 from app.schema.auth_schema import SignIn, SignInResponse, SignUp
 from app.schema.user_schema import User
 from app.services.auth_service import AuthService
@@ -28,5 +31,7 @@ def sign_up(user_info: SignUp, service: AuthService = Depends(Provide[Container.
 
 @router.get("/me", response_model=User)
 @inject
-def get_me(current_user: User = Depends(get_current_active_user)):
+def get_me(current_user: User = Security(get_current_active_user)):
     return current_user
+
+

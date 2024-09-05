@@ -12,12 +12,12 @@ from app.util.query_builder import dict_to_sqlalchemy_filter_options
 T = TypeVar("T", bound=BaseModel)
 
 
-class BaseRepository:
+class  BaseRepository:
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]], model: Type[T]) -> None:
         self.session_factory = session_factory
         self.model = model
 
-    def read_by_options(self, schema: T, eager: bool = False) -> dict:
+    def read(self, schema: T) -> dict:
         with self.session_factory() as session:
             schema_as_dict: dict = schema.dict(exclude_none=True)
             ordering: str = schema_as_dict.get("ordering", configs.ORDERING)
@@ -50,27 +50,24 @@ class BaseRepository:
                 },
             }
 
-    def read_by_id(self, id: int, eager: bool = False):
+    def read_by_id(self, id: int):
         with self.session_factory() as session:
             query = session.query(self.model)
-            if eager:
-                for eager in getattr(self.model, "eagers", []):
-                    query = query.options(joinedload(getattr(self.model, eager)))
-            query = query.filter(self.model.id == id).first()
-            if not query:
+            result = query.filter(self.model.id == id).first()
+            if not result:
                 raise NotFoundError(detail=f"not found id : {id}")
-            return query
+            return result
 
     def create(self, schema: T):
         with self.session_factory() as session:
-            query = self.model(**schema.dict())
+            new_instance = self.model(**schema.dict())
             try:
-                session.add(query)
+                session.add(new_instance)
                 session.commit()
-                session.refresh(query)
+                session.refresh(new_instance)
             except IntegrityError as e:
                 raise DuplicatedError(detail=str(e.orig))
-            return query
+            return new_instance
 
     def update(self, id: int, schema: T):
         with self.session_factory() as session:

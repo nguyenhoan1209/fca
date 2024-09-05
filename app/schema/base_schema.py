@@ -6,8 +6,7 @@ from pydantic import BaseModel
 
 class ModelBaseInfo(BaseModel):
     id: int
-    created_at: datetime
-    updated_at: datetime
+
 
 
 class FindBase(BaseModel):
@@ -25,11 +24,7 @@ class FindResult(BaseModel):
     search_options: Optional[SearchOptions]
 
 
-class FindDateRange(BaseModel):
-    created_at__lt: str
-    created_at__lte: str
-    created_at__gt: str
-    created_at__gte: str
+
 
 
 class Blank(BaseModel):

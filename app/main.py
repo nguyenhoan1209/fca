@@ -36,7 +36,7 @@ class AppCreator:
         # set routes
         @self.app.get("/")
         def root():
-            return "service is working"
+            return {"message": "service is working"}
 
         self.app.include_router(v1_routers, prefix=configs.API_V1_STR)
         self.app.include_router(v2_routers, prefix=configs.API_V2_STR)

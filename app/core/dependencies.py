@@ -1,11 +1,12 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
+from fastapi.security import SecurityScopes
 from jose import jwt
 from pydantic import ValidationError
 
 from app.core.config import configs
 from app.core.container import Container
-from app.core.exceptions import AuthError
+from app.core.exceptions import AuthError, PermissionError
 from app.core.security import ALGORITHM, JWTBearer
 from app.model.user import User
 from app.schema.auth_schema import Payload
@@ -14,17 +15,24 @@ from app.services.user_service import UserService
 
 @inject
 def get_current_user(
+    security_scopes: SecurityScopes,
     token: str = Depends(JWTBearer()),
     service: UserService = Depends(Provide[Container.user_service]),
 ) -> User:
     try:
         payload = jwt.decode(token, configs.SECRET_KEY, algorithms=ALGORITHM)
         token_data = Payload(**payload)
+        print(token_data)
     except (jwt.JWTError, ValidationError):
         raise AuthError(detail="Could not validate credentials")
+    if security_scopes.scopes and not token_data.scopes:
+        raise PermissionError(detail="Not enough permissions")
+    if security_scopes.scopes and token_data.scopes not in security_scopes.scopes:
+        raise PermissionError(detail="Not enough permissions")
     current_user: User = service.get_by_id(token_data.id)
     if not current_user:
         raise AuthError(detail="User not found")
+    
     return current_user
 
 

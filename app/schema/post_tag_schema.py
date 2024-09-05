@@ -4,7 +4,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from app.schema.base_schema import FindBase, ModelBaseInfo, SearchOptions
-from app.util.schema import AllOptional
 
 
 class BasePost(BaseModel):
@@ -17,13 +16,13 @@ class BasePost(BaseModel):
         orm_mode = True
 
 
-class Post(ModelBaseInfo, BasePost, metaclass=AllOptional): ...
+class Post(ModelBaseInfo, BasePost, ): ...
 
 
-class FindPost(FindBase, BasePost, metaclass=AllOptional): ...
+class FindPost(FindBase, BasePost, ): ...
 
 
-class UpsertPost(BasePost, metaclass=AllOptional): ...
+class UpsertPost(BasePost, ): ...
 
 
 class FindPostResult(BaseModel):
@@ -40,14 +39,14 @@ class BaseTag(BaseModel):
         orm_mode = True
 
 
-class Tag(ModelBaseInfo, BaseTag, metaclass=AllOptional): ...
+class Tag(ModelBaseInfo, BaseTag, ): ...
 
 
-class FindTag(FindBase, BaseTag, metaclass=AllOptional):
+class FindTag(FindBase, BaseTag, ):
     id__in: str
 
 
-class UpsertTag(BaseTag, metaclass=AllOptional): ...
+class UpsertTag(BaseTag, ): ...
 
 
 class FindTagResult(BaseModel):

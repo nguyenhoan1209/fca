@@ -1,5 +1,6 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.container import Container
 from app.core.dependencies import get_current_active_user
@@ -16,7 +17,7 @@ router = APIRouter(
 
 @router.post("/sign-in", response_model=SignInResponse)
 @inject
-def sign_in(user_info: SignIn, service: AuthService = Depends(Provide[Container.auth_service])):
+def sign_in(user_info: OAuth2PasswordRequestForm = Depends(), service: AuthService = Depends(Provide[Container.auth_service])):
     return service.sign_in(user_info)
 
 

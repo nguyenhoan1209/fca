@@ -15,7 +15,7 @@ class PostRepository(BaseRepository):
 
     def create_with_tags(self, schema: UpsertPostWithTags, tags):
         with self.session_factory() as session:
-            query = self.model(**schema.dict())
+            query = self.model(**schema.model_dump())
             session.add(query)
             if tags:
                 query.tags = tags
