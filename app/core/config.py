@@ -24,7 +24,7 @@ class Configs(BaseSettings):
     }
     DB_ENGINE_MAPPER: dict = {
         "postgresql": "postgresql",
-        "mysql": "mysql+pymysql",
+        "mysql": "mysql+aiomysql",
     }
 
     PROJECT_ROOT: str = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

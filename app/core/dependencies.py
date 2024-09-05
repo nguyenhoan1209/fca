@@ -14,7 +14,7 @@ from app.services.user_service import UserService
 
 
 @inject
-def get_current_user(
+async def get_current_user(
     security_scopes: SecurityScopes,
     token: str = Depends(JWTBearer()),
     service: UserService = Depends(Provide[Container.user_service]),
@@ -22,14 +22,13 @@ def get_current_user(
     try:
         payload = jwt.decode(token, configs.SECRET_KEY, algorithms=ALGORITHM)
         token_data = Payload(**payload)
-        print(token_data)
     except (jwt.JWTError, ValidationError):
         raise AuthError(detail="Could not validate credentials")
     if security_scopes.scopes and not token_data.scopes:
         raise PermissionError(detail="Not enough permissions")
     if security_scopes.scopes and token_data.scopes not in security_scopes.scopes:
         raise PermissionError(detail="Not enough permissions")
-    current_user: User = service.get_by_id(token_data.id)
+    current_user: User = await service.get_by_id(token_data.id)
     if not current_user:
         raise AuthError(detail="User not found")
     

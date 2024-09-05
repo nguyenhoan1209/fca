@@ -17,8 +17,8 @@ class AuthService(BaseService):
         self.user_repository = user_repository
         super().__init__(user_repository)
 
-    def sign_in(self, sign_in_info: SignIn):
-        user: Optional[User] = self.user_repository.get_by_email(sign_in_info.email)
+    async def sign_in(self, sign_in_info: SignIn):
+        user: Optional[User] = await self.user_repository.get_by_email(sign_in_info.email)
 
         if not user:
             raise AuthError(detail="Incorrect email or password")
@@ -41,12 +41,14 @@ class AuthService(BaseService):
             "expiration": expiration_datetime,
             "user": user
         }
+
         return sign_in_result
 
 
-    def sign_up(self, user_info: SignUp):
+    async def sign_up(self, user_info: SignUp)-> User:
         user_token = get_rand_hash()
         user = User(**user_info.model_dump(exclude_none=True), is_active=True, is_superuser=False, user_token=user_token)
         user.password = get_password_hash(user_info.password)
-        created_user = self.user_repository.create(user)
+        created_user = await self.user_repository.create(user)
         return created_user
+

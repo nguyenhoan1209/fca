@@ -1,3 +1,4 @@
+from loguru import logger
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
@@ -21,7 +22,8 @@ class AppCreator:
         # set db and container
         self.container = Container()
         self.db = self.container.db()
-        # self.db.create_database()
+
+        
 
         # set cors
         if configs.BACKEND_CORS_ORIGINS:
