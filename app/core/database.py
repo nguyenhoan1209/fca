@@ -1,9 +1,12 @@
-from contextlib import AbstractContextManager, contextmanager
-from typing import Any, Generator
+from contextlib import AbstractAsyncContextManager, asynccontextmanager
+from typing import Any, AsyncGenerator
 
-from sqlalchemy import create_engine, orm
+from loguru import logger
+
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @as_declarative()
@@ -19,25 +22,28 @@ class BaseModel:
 
 class Database:
     def __init__(self, db_url: str) -> None:
-        self._engine = create_engine(db_url, echo=True)
-        self._session_factory = orm.scoped_session(
-            orm.sessionmaker(
-                autocommit=False,
-                autoflush=False,
-                bind=self._engine,
-            ),
+        self._engine = create_async_engine(db_url, echo=True)
+        self._session_factory = sessionmaker(
+            bind=self._engine,
+            class_=AsyncSession,
+            autocommit=False,
+            autoflush=False,
+            expire_on_commit=False,
         )
 
-    def create_database(self) -> None:
-        BaseModel.metadata.create_all(self._engine)
+    async def create_database(self) -> None:
+        async with self._engine.begin() as conn:
+            logger.info("Creating tables")
+            await conn.run_sync(BaseModel.metadata.create_all)
 
-    @contextmanager
-    def session(self) -> Generator[Any, Any, AbstractContextManager[Session]]:
-        session: Session = self._session_factory()
+    @asynccontextmanager
+    async def session(self) -> AsyncGenerator[AsyncSession, AbstractAsyncContextManager[AsyncSession]]:
+        session: AsyncSession = self._session_factory()
         try:
             yield session
+            await session.commit()
         except Exception:
-            session.rollback()
+            await session.rollback()
             raise
         finally:
-            session.close()
+            await session.close()

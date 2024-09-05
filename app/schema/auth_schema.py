@@ -9,6 +9,9 @@ from app.schema.user_schema import User
 class SignIn(BaseModel):
     email: str
     password: str
+    
+    class Config:
+        orm_mode = True
 
 
 class SignUp(BaseModel):
@@ -16,6 +19,8 @@ class SignUp(BaseModel):
     password: str
     name: str
 
+    class Config:
+        orm_mode = True
 
 class Payload(BaseModel):
     id: int
@@ -29,3 +34,6 @@ class SignInResponse(BaseModel):
     access_token: str
     expiration: datetime
     user: User
+    
+    class Config:
+        orm_mode = True
