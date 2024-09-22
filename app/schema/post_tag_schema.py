@@ -7,7 +7,6 @@ from app.schema.base_schema import FindBase, ModelBaseInfo, SearchOptions
 
 
 class BasePost(BaseModel):
-    user_token: str
     title: str
     content: str
     is_published: bool
@@ -31,7 +30,6 @@ class FindPostResult(BaseModel):
 
 
 class BaseTag(BaseModel):
-    user_token: str
     name: str
     description: str
 

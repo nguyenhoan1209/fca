@@ -17,48 +17,48 @@ router = APIRouter(
 
 @router.get("", response_model=FindTagResult)
 @inject
-def get_tag_list(
+async def get_tag_list(
     find_query: FindTag = Depends(),
     service: TagService = Depends(Provide[Container.tag_service]),
 ):
-    return service.get_list(find_query)
+    return await service.get_list(find_query)
 
 
 @router.get("/{tag_id}", response_model=Tag)
 @inject
-def get_tag(
+async def get_tag(
     tag_id: int,
     service: TagService = Depends(Provide[Container.tag_service]),
 ):
-    return service.get_by_id(tag_id)
+    return await service.get_by_id(tag_id)
 
 
 @router.post("", response_model=Tag)
 @inject
-def create_tag(
+async def create_tag(
     tag: UpsertTag,
     service: TagService = Depends(Provide[Container.tag_service]),
     current_user: User = Depends(get_current_active_user),
 ):
-    return service.add(tag)
+    return await service.add(tag)
 
 
 @router.patch("/{tag_id}", response_model=Tag)
 @inject
-def update_tag(
+async def update_tag(
     tag_id: int,
     tag: UpsertTag,
     service: TagService = Depends(Provide[Container.tag_service]),
     current_user: User = Depends(get_current_active_user),
 ):
-    return service.patch(tag_id, tag)
+    return await service.patch(tag_id, tag)
 
 
 @router.delete("/{tag_id}", response_model=Blank)
 @inject
-def delete_tag(
+async def delete_tag(
     tag_id: int,
     service: TagService = Depends(Provide[Container.tag_service]),
     current_user: User = Depends(get_current_active_user),
 ):
-    return service.remove_by_id(tag_id)
+    return await service.remove_by_id(tag_id)

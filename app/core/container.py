@@ -1,3 +1,4 @@
+from venv import logger
 from dependency_injector import containers, providers
 
 from app.core.config import configs
