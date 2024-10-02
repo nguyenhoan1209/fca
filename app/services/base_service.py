@@ -2,7 +2,7 @@ from typing import Any, Protocol
 
 
 class RepositoryProtocol(Protocol):
-    async def read(self) -> Any: ...
+    async def read_by_options(self, schema: Any) -> Any: ...
 
     async def read_by_id(self, id: int) -> Any: ...
 
@@ -21,8 +21,8 @@ class BaseService:
     def __init__(self, repository: RepositoryProtocol) -> None:
         self._repository = repository
 
-    async def get_list(self) -> Any:
-        return await self._repository.read()
+    async def get_list(self, schema: Any) -> Any:
+        return self._repository.read_by_options(schema)
 
     async def get_by_id(self, id: int) -> Any:
         return await self._repository.read_by_id(id)

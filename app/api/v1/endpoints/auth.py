@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Security
 
 from app.core.container import Container
 from app.core.dependencies import get_current_active_user
+from app.core.constant import Role
 
 from app.core.middleware import inject
 
